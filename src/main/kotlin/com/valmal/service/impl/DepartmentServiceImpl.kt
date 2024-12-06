@@ -1,18 +1,25 @@
 package com.valmal.service.impl
 
 import com.valmal.dto.DepartmentsDto
+import com.valmal.entity.DepartmentEntity
+import com.valmal.repository.DepartmentsRepository
 import com.valmal.service.DepartmentService
 import org.springframework.stereotype.Service
 
 @Service
-class DepartmentServiceImpl: DepartmentService {
+class DepartmentServiceImpl(
+    private val departmentsRepository: DepartmentsRepository
+) : DepartmentService {
 
     override fun getAll(): List<DepartmentsDto> {
-        return listOf(
-            DepartmentsDto(1, "Теплобюро"),
-            DepartmentsDto(2, "Электробюро"),
-            DepartmentsDto(3, "Экобюро"),
-            DepartmentsDto(4, "Участок водоподготовки")
-        )
+        return departmentsRepository.findByOrderByName().map {
+            it.asDepartmentDto()
+        }
     }
+
+    private fun DepartmentEntity.asDepartmentDto(): DepartmentsDto =
+        DepartmentsDto(
+            id = this.id,
+            name = this.name
+        )
 }
